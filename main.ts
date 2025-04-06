@@ -53,6 +53,7 @@ export default class BibleLinkerPro extends Plugin {
 	//Set current plugin version
 	currentPluginVersion = this.manifest.version;
 
+	//Function to get a translation of a given key if available in the selected language
 	getTranslation(key: string) {
 		const langBase = this.getLangBase();
 		const attemptTranslating =
@@ -88,12 +89,6 @@ export default class BibleLinkerPro extends Plugin {
 
 		await this.saveSettings();
 
-		// this.registerView(VIEW_TYPE_EXAMPLE, (leaf) => new ExampleView(leaf));
-
-		// this.addRibbonIcon("canvas", "Activate view", () => {
-		// 	this.activateView();
-		// });
-
 		const errorModal = new ErrorModal(this.app);
 
 		this.registerEvent(
@@ -104,7 +99,22 @@ export default class BibleLinkerPro extends Plugin {
 						item.setTitle("Convert Bible text to JW Library link")
 							.setIcon("link")
 							.onClick(async () => {
-								convertBibleTextToJWLibraryLink(editor, view);
+								convertBibleTextToJWLibraryLink(editor, true);
+							});
+					});
+				}
+			)
+		);
+
+		this.registerEvent(
+			this.app.workspace.on(
+				"editor-menu",
+				(menu, editor, view: MarkdownView) => {
+					menu.addItem((item) => {
+						item.setTitle("Open Bible text in JW Library")
+							.setIcon("link")
+							.onClick(async () => {
+								convertBibleTextToJWLibraryLink(editor, false);
 							});
 					});
 				}
@@ -113,7 +123,7 @@ export default class BibleLinkerPro extends Plugin {
 
 		const convertBibleTextToJWLibraryLink = (
 			editor: Editor,
-			view: MarkdownView
+			replaceText: boolean
 		) => {
 			let input;
 			try {
@@ -410,6 +420,76 @@ export default class BibleLinkerPro extends Plugin {
 					["ap", "apo", "apocalipse"],
 				];
 
+				const wtLocalePt = "TPO";
+				const bibleBooksPt = [
+					["ge", "gén", "gênesis"],
+					["ex", "êx", "êxo", "êxodo"],
+					["le", "lev", "levítico"],
+					["n", "núm", "números"],
+					["de", "deu", "deuteronómio"],
+					["jos", "josué"],
+					["jz", "juí", "juízes"],
+					["ru", "rute"],
+					["1sa", "1sam", "1samuel"],
+					["2sa", "2sam", "2samuel"],
+					["1rs", "1reis"],
+					["2rs", "2reis"],
+					["1cr", "1crô", "1crónicas"],
+					["2cr", "2crô", "2crónicas"],
+					["esd", "esd", "esdras"],
+					["ne", "nee", "neemias"],
+					["est", "ester"],
+					["jó"],
+					["sal", "salmos"],
+					["pr", "pro", "provérbios"],
+					["ec", "ecl", "eclesiastes"],
+					["cân", "cântico de salomão"],
+					["is", "isa", "isaías"],
+					["je", "jer", "jeremias"],
+					["la", "lam", "lamentações"],
+					["ez", "eze", "ezequiel"],
+					["da", "dan", "daniel"],
+					["os", "ose", "oseias"],
+					["jl", "joel"],
+					["am", "amós"],
+					["ob", "obd", "obadias"],
+					["jon", "jonas"],
+					["miq", "miq", "miqueias"],
+					["na", "naum"],
+					["hab", "habacuque"],
+					["sof", "sofonias"],
+					["ag", "ageu"],
+					["za", "zac", "zacarias"],
+					["mal", "malaquias"],
+					["mt", "mat", "mateus"],
+					["mr", "mar", "marcos"],
+					["lu", "luc", "lucas"],
+					["jo", "joão"],
+					["at", "atos"],
+					["ro", "rom", "romanos"],
+					["1co", "1cor", "1coríntios"],
+					["2co", "2cor", "2coríntios"],
+					["gál", "gálatas"],
+					["ef", "efé", "efésios"],
+					["fil", "filipenses"],
+					["col", "colossenses"],
+					["1te", "1tes", "1tessalonicenses"],
+					["2te", "2tes", "2tessalonicenses"],
+					["1ti", "1tim", "1timóteo"],
+					["2ti", "2tim", "2timóteo"],
+					["tit", "tito"],
+					["flm", "filêm", "filémon"],
+					["he", "heb", "hebreus"],
+					["tg", "tia", "tiago"],
+					["1pe", "1ped", "1pedro"],
+					["2pe", "2ped", "2pedro"],
+					["1jo", "1joão"],
+					["2jo", "2joão"],
+					["3jo", "3joão"],
+					["ju", "judas"],
+					["ap", "apo", "apocalipse"],
+				];
+
 				const wtLocaleDE = "X";
 				const bibleBooksDE = [
 					["1mo", "1mose"],
@@ -628,27 +708,206 @@ export default class BibleLinkerPro extends Plugin {
 					["il", "ilmestys"],
 				];
 
+				const wtLocaleUA = "K";
+				const bibleBooksUA = [
+					["бт", "бут", "буття"],
+					["вх", "вих", "вихід"],
+					["лв", "лев", "левит"],
+					["чс", "чис", "числа"],
+					["вт", "втор", "повт", "повторення", "второзаконня"],
+					["нав", "існ", "єгошуа", "ісус навин"],
+					["сд", "суд", "судді", "суддів"],
+					["рт", "рут"],
+					["1см", "1сам", "1цар", "1самуїла"],
+					["2см", "2сам", "2цар", "2самуїла"],
+					["1цр", "1цар", "3цар", "1царів"],
+					["2цр", "2цар", "4цар", "2царів"],
+					[
+						"1п",
+						"1хр",
+						"1пар",
+						"1хронік",
+						"1хроніки",
+						"1паралипоменон",
+					],
+					[
+						"2п",
+						"2хр",
+						"2пар",
+						"2хронік",
+						"2хроніки",
+						"2паралипоменон",
+					],
+					["езд", "єзд", "ездра"],
+					["не", "нем", "неєм", "неємія"],
+					["ес", "ест", "естер", "есфір"],
+					["йв", "йов", "іов", "иов"],
+					["пс", "псалом", "псалми"],
+					["пр", "прип", "притчі", "приповісті"],
+					["ек", "екл", "еккл", "екклезіаста"],
+					[
+						"псн",
+						"пісн",
+						"пісня",
+						"пісня пісень",
+						"пісня над піснями",
+					],
+					["іс", "ісая", "ісаї"],
+					["єр", "єрем", "єремія"],
+					["пл", "плач", "плач єремії"],
+					["єз", "єзек", "єзекіїль"],
+					["дн", "дан", "даниїл"],
+					["ос", "осія"],
+					["йл", "йоіл", "йоїл", "йоель", "іоїль"],
+					["ам", "амос"],
+					["ов", "овд", "овдій", "авдій"],
+					["йн", "йона", "іона"],
+					["мих", "михей"],
+					["на", "наум", "наумій"],
+					["ав", "авв", "авакум"],
+					["сф", "соф", "софонія"],
+					["ог", "огій", "аггей"],
+					["зх", "зах", "захарія"],
+					["мл", "мал", "малахія"],
+					["мт", "мат", "матвій", "матвія"],
+					["мк", "мр", "марк", "марка"],
+					["лк", "лук", "лука"],
+					["ів", "йн", "іван", "йоан", "івана"],
+					["дії", "діяння"],
+					["рм", "рим", "римлян"],
+					["1кр", "1кор", "1коринфян"],
+					["2кр", "2кор", "2коринфян"],
+					["гл", "гал", "галатів"],
+					["еф", "ефесян"],
+					["флп", "филипян", "филип'ян", "филип'янам"],
+					["кол", "колосян"],
+					["1фс", "1фес", "1фессалонікійців"],
+					["2фс", "2фес", "2фессалонікійців"],
+					["1тм", "1тим", "1тимофія", "1тимофію"],
+					["2тм", "2тим", "2тимофія", "2тимофію"],
+					["тит", "тита"],
+					["флм", "филимона"],
+					["єв", "євр", "євреїв"],
+					["як", "яків", "якова"],
+					["1пт", "1пет", "1петра"],
+					["2пт", "2пет", "2петра"],
+					["1ів", "1йн", "1івана", "1йоана"],
+					["2ів", "2йн", "2івана", "2йоана"],
+					["3ів", "3йн", "3івана", "3йоана"],
+					["юд", "юди", "юда"],
+					["об", "обявл", "одкровення", "об'явлення"],
+				];
+
+				const wtLocaleHU = "H";
+				const bibleBooksHU = [
+					["1mó", "1mo", "1mózes"],
+					["2mó", "2mo", "2mózes"],
+					["3mó", "3mo", "3mózes"],
+					["4mó", "4mo", "4mózes"],
+					["5mó", "5mo", "5mózes"],
+					["jzs", "jozs", "józsué"],
+					["bí", "bir", "bírák"],
+					["ru", "ruth", "ruth"],
+					["1sá", "1sam", "1sámuel"],
+					["2sá", "2sam", "2sámuel"],
+					["1ki", "1kir", "1királyok"],
+					["2ki", "2kir", "2királyok"],
+					["1kr", "1kron", "1krónikák"],
+					["2kr", "2kron", "2krónikák"],
+					["ezs", "ezsdr", "ezsdrás"],
+					["ne", "neh", "nehémiás"],
+					["esz", "eszt", "eszter"],
+					["jób", "job", "jób"],
+					["zs", "zsolt", "zsoltárok"],
+					["pl", "peld", "példabeszédek"],
+					["pr", "pred", "prédikátor"],
+					["én", "enek", "énekek éneke"],
+					["ézs", "ezsai", "ézsaiás"],
+					["jr", "jer", "jeremiás"],
+					["si", "siral", "siralmak"],
+					["ez", "ezek", "ezékiel"],
+					["dá", "dan", "dániel"],
+					["hó", "hos", "hóseás"],
+					["jóe", "joel", "jóel"],
+					["ám", "amo", "ámós"],
+					["ab", "abd", "abdiás"],
+					["jón", "jónás", "jónás"],
+					["mi", "mike", "mikeás"],
+					["ná", "nah", "náhum"],
+					["ha", "hab", "habakuk"],
+					["so", "sof", "sofóniás"],
+					["ag", "agg", "aggeus"],
+					["za", "zak", "zakariás"],
+					["ma", "mal", "malakiás"],
+					["mt", "mat", "máté"],
+					["mr", "mar", "márk"],
+					["lk", "luk", "lukács"],
+					["jn", "ján", "jános"],
+					["cs", "csel", "cselekedetek"],
+					["ró", "rom", "róma"],
+					["1ko", "1kor", "1korintusz"],
+					["2ko", "2kor", "2korintusz"],
+					["ga", "gal", "galácia"],
+					["ef", "efez", "efézus"],
+					["flp", "filip", "filippi"],
+					["kol", "kolosz", "kolosszé"],
+					["1te", "1tesz", "1tesszalonika"],
+					["2te", "2tesz", "2tesszalonika"],
+					["1tim", "1timo", "1timóteusz"],
+					["2tim", "2timo", "2timóteusz"],
+					["tit", "titu", "titusz"],
+					["flm", "filem", "filemon"],
+					["héb", "heb", "héberek"],
+					["jk", "jak", "jakab"],
+					["1pt", "1pet", "1péter"],
+					["2pt", "2pet", "2péter"],
+					["1jn", "1jan", "1jános"],
+					["2jn", "2jan", "2jános"],
+					["3jn", "3jan", "3jános"],
+					["júd", "júdás"],
+					["jel", "jelen", "jelenések"],
+				];
+
 				let wtLocale = wtLocaleEN;
 				let bibleBooks = bibleBooksEN;
 
-				if (this.settings.pluginLanguage == "nl") {
-					wtLocale = wtLocaleNL;
-					bibleBooks = bibleBooksNL;
-				} else if (this.settings.pluginLanguage == "fr") {
-					wtLocale = wtLocaleFR;
-					bibleBooks = bibleBooksFR;
-				} else if (this.settings.pluginLanguage == "pt-br") {
-					wtLocale = wtLocalePtBr;
-					bibleBooks = bibleBooksPtBr;
-				} else if (this.settings.pluginLanguage == "de") {
-					wtLocale = wtLocaleDE;
-					bibleBooks = bibleBooksDE;
-				} else if (this.settings.pluginLanguage == "es") {
-					wtLocale = wtLocaleES;
-					bibleBooks = bibleBooksES;
-				} else if (this.settings.pluginLanguage == "fi") {
-					wtLocale = wtLocaleFI;
-					bibleBooks = bibleBooksFI;
+				switch (this.settings.pluginLanguage) {
+					case "nl":
+						wtLocale = wtLocaleNL;
+						bibleBooks = bibleBooksNL;
+						break;
+					case "fr":
+						wtLocale = wtLocaleFR;
+						bibleBooks = bibleBooksFR;
+						break;
+					case "pt-br":
+						wtLocale = wtLocalePtBr;
+						bibleBooks = bibleBooksPtBr;
+						break;
+					case "pt":
+						wtLocale = wtLocalePt;
+						bibleBooks = bibleBooksPt;
+						break;
+					case "de":
+						wtLocale = wtLocaleDE;
+						bibleBooks = bibleBooksDE;
+						break;
+					case "es":
+						wtLocale = wtLocaleES;
+						bibleBooks = bibleBooksES;
+						break;
+					case "fi":
+						wtLocale = wtLocaleFI;
+						bibleBooks = bibleBooksFI;
+						break;
+					case "ua":
+						wtLocale = wtLocaleUA;
+						bibleBooks = bibleBooksUA;
+						break;
+					case "hu":
+						wtLocale = wtLocaleHU;
+						bibleBooks = bibleBooksHU;
+						break;
 				}
 
 				let linkOutput = "";
@@ -674,6 +933,17 @@ export default class BibleLinkerPro extends Plugin {
 						bibleBookLong = bibleBooks[i][bibleBooks[i].length - 1];
 						i = bibleBooks.length;
 					}
+				}
+
+				if (bibleBookLong == undefined) {
+					//If an error occurs, replace text with initial input
+					if (input != null) {
+						editor.replaceSelection(input);
+					}
+
+					errorModal.setText(this.getTranslation("INVALID_INPUT"));
+					errorModal.open();
+					return;
 				}
 
 				let chapter = input.split(" ")[1];
@@ -792,9 +1062,14 @@ export default class BibleLinkerPro extends Plugin {
 					this.settings.linkSuffix;
 
 				const link = `jwlibrary:///finder?srcid=jwlshare&wtlocale=${wtLocale}&prefer=lang&pub=${this.settings.bibleEdition}&bible=${linkOutput}`;
-				editor.replaceSelection("[" + renderOutput + "](" + link + ")");
 
-				if (this.settings.autoOpenLink) {
+				if (replaceText) {
+					editor.replaceSelection(
+						"[" + renderOutput + "](" + link + ")"
+					);
+				}
+
+				if (this.settings.autoOpenLink || !replaceText) {
 					window.open(link);
 				}
 			} catch (error) {
@@ -809,16 +1084,24 @@ export default class BibleLinkerPro extends Plugin {
 			}
 		};
 
-		// This adds an editor command that can perform some operation on the current editor instance
+		//Add editor commands
 		this.addCommand({
 			id: "convert-Bible-text-to-JW-Library-link",
 			name: "Convert Bible text to JW Library link",
 			editorCallback: (editor: Editor, view: MarkdownView) => {
-				convertBibleTextToJWLibraryLink(editor, view);
+				convertBibleTextToJWLibraryLink(editor, true);
 			},
 		});
 
-		// This adds a settings tab so the user can configure various aspects of the plugin
+		this.addCommand({
+			id: "open-Bible-text-in-JW-Library",
+			name: "Open Bible text in JW Library",
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				convertBibleTextToJWLibraryLink(editor, false);
+			},
+		});
+
+		//Add a settings tab so the user can configure plugin settings
 		this.addSettingTab(new MainSettingTab(this.app, this));
 
 		//Update notes modal
@@ -832,24 +1115,6 @@ export default class BibleLinkerPro extends Plugin {
 	}
 
 	onunload() {}
-
-	// async activateView() {
-	// 	const { workspace } = this.app;
-
-	// 	let leaf: WorkspaceLeaf | null = null;
-	// 	const leaves = workspace.getLeavesOfType(VIEW_TYPE_EXAMPLE);
-
-	// 	if (leaves.length > 0) {
-	// 		// A leaf with our view already exists, use that
-	// 		leaf = leaves[0];
-	// 	} else {
-	// 		// Our view could not be found in the workspace, create a new leaf
-	// 		// in the right sidebar for it
-	// 		leaf = workspace.getRightLeaf(false);
-	// 		await leaf.setViewState({ type: VIEW_TYPE_EXAMPLE, active: true });
-	// 	}
-	// 	workspace.revealLeaf(leaf);
-	// }
 
 	async loadSettings() {
 		this.settings = Object.assign(
@@ -910,22 +1175,31 @@ class UpdateNotesModal extends Modal {
 				")",
 		});
 		contentEl.createEl("h3", { text: "What's new?" });
-		contentEl.createEl("p", {
-			text: "-   Fixed broken JW Libary links on Windows by @regapictures",
-		});
-		contentEl.createEl("p", { text: "-   Added Finnish by @amahlaka" });
-		contentEl.createEl("p", {
-			text: "-   Added Spanish by @Marc-Fernandez",
-		});
-		contentEl.createEl("p", {
-			text: "-   Added setting to choose which edition of the Bible you want to use (nwt or nwtsty).",
-		});
-		contentEl.createEl("p", {
-			text: "-   Fixed misspelled Genesis book in French by @DarkBuffalo",
-		});
-		contentEl.createEl("p", {
-			text: "-   Fixed misspelled Daniel book in English by @emir1nemir",
-		});
+		contentEl.createEl("br");
+
+		//Changelog
+		const splashScreenText = `
+		-   Added new command "Open Bible text in JW Library" to only open the Bible text without replacing text in the editor.
+-   Added Portuguese (Portugal) by @joao-p-marques
+-   Added Hungarian by @MGeri97
+-   When a Bible text is not recognized, it keeps the original content instead of replacing it with "Undefined" by @xrtxn
+-   Improved visual of splash screen
+		`;
+		const splayScreenList = splashScreenText
+			.replace(/-   /g, "")
+			.split("\n");
+
+		for (let i = 0; i < splayScreenList.length; i++) {
+			if (splayScreenList[i].length > 2) {
+				contentEl.createEl("li", {
+					text: splayScreenList[i],
+				});
+				contentEl.createEl("br");
+			}
+		}
+
+		contentEl.createEl("br");
+		contentEl.createEl("br");
 
 		const dismisButton = contentEl.createEl("button", {
 			text: "Let's check it out!",
